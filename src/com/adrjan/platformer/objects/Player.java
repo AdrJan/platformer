@@ -151,7 +151,7 @@ public class Player extends GameObject {
     }
 
     public void render(Graphics g) {
-        g.drawImage(BufferedImageLoader.getImageByName("/robo.gif"), (int) x, (int) y, 32, 64, null);
+        g.drawImage(BufferedImageLoader.getImageByName("robo.gif"), (int) x, (int) y, 32, 64, null);
     }
 
     public Rectangle getBounds() {

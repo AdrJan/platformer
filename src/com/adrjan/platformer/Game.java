@@ -22,21 +22,9 @@ public class Game extends Canvas implements Runnable {
     Camera camera;
     Player player;
 
-    private BufferedImage bg = null;
-    private BufferedImage blockImg = null;
-    private BufferedImage playerImg = null;
-
     private void init() {
         WIDTH = getWidth();
         HEIGHT = getHeight();
-        BufferedImageLoader loader = new BufferedImageLoader();
-        loader.loadImage("/level1.png");
-        loader.loadImage("/bgsimple.png");
-        loader.loadImage("/block1.png");
-        loader.loadImage("/block2.png");
-        loader.loadImage("/block3.png");
-        loader.loadImage("/block4.png");
-        loader.loadImage("/robo.gif");
 
         handler = new Handler();
         camera = new Camera();
@@ -44,7 +32,7 @@ public class Game extends Canvas implements Runnable {
         player = new Player(64, 690, handler, camera, ObjectId.Player);
         this.addKeyListener(new KeyInput(handler, player));
         handler.addObject(player);
-        loadImageLevel(BufferedImageLoader.getImageByName("/level1.png"));
+        loadImageLevel(BufferedImageLoader.getImageByName("level1.png"));
     }
 
     public synchronized void start() {
@@ -108,7 +96,7 @@ public class Game extends Canvas implements Runnable {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         //DRAWING
-        g.drawImage(BufferedImageLoader.getImageByName("/bgsimple.png"), 0, 0, this);
+        g.drawImage(BufferedImageLoader.getImageByName("bgsimple.png"), 0, 0, this);
         g2d.translate(camera.getX(), camera.getY());
         handler.render(g);
         g2d.translate(-camera.getX(), -camera.getY());
@@ -148,7 +136,7 @@ public class Game extends Canvas implements Runnable {
                 if (red == 255 && green == 0 && blue == 0)
                     handler.addObject(new DeathTrap(xx * 32, yy * 32, ObjectId.DeathTrap));
                 if (red == 255 && green == 255 && blue == 255)
-                    handler.addObject(new Block(xx * 32, yy * 32, ObjectId.Block, blockImg));
+                    handler.addObject(new Block(xx * 32, yy * 32, ObjectId.Block));
                 if (red == 255 && green == 255 && blue == 0)
                     handler.addObject(new Coin(xx * 32, yy * 32, handler, ObjectId.Coin));
             }
