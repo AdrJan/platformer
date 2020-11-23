@@ -1,4 +1,4 @@
-package com.adrjan.platformer;
+package com.adrjan.platformer.framework;
 
 import javax.swing.*;
 import java.awt.*;
@@ -21,5 +21,4 @@ public class Window {
 
         game.start();
     }
-
 }

@@ -1,7 +1,5 @@
 package com.adrjan.platformer.objects;
 
-import com.adrjan.platformer.framework.ObjectId;
-
 import java.awt.*;
 import java.util.LinkedList;
 
@@ -75,16 +73,5 @@ public abstract class GameObject {
 
     public void setJumping(boolean jumping) {
         this.jumping = jumping;
-    }
-
-    public float approach(float G, float C, float diff) {
-        float D = G - C;
-
-        if (D > diff)
-            return C + diff;
-        if (D < -diff)
-            return C - diff;
-
-        return G;
     }
 }

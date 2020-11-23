@@ -1,12 +1,14 @@
-package com.adrjan.platformer;
+package com.adrjan.platformer.framework;
 
-import com.adrjan.platformer.framework.KeyInput;
-import com.adrjan.platformer.framework.ObjectId;
-import com.adrjan.platformer.objects.*;
+import com.adrjan.platformer.framework.control.KeyInput;
+import com.adrjan.platformer.objects.ObjectId;
+import com.adrjan.platformer.framework.data_loaders.BufferedImageLoader;
+import com.adrjan.platformer.framework.visual.Camera;
+import com.adrjan.platformer.framework.data_loaders.LevelLoader;
+import com.adrjan.platformer.objects.player.Player;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
-import java.awt.image.BufferedImage;
 
 public class Game extends Canvas implements Runnable {
 
@@ -14,9 +16,9 @@ public class Game extends Canvas implements Runnable {
 
     public static int WIDTH, HEIGHT;
 
-    Handler handler;
-    Camera camera;
-    Player player;
+    private Handler handler;
+    private Camera camera;
+    private Player player;
 
     private void init() {
         WIDTH = getWidth();
@@ -28,7 +30,7 @@ public class Game extends Canvas implements Runnable {
         player = new Player(0, 0, handler, camera, ObjectId.Player);
         this.addKeyListener(new KeyInput(handler, player));
         handler.addObject(player);
-        loadImageLevel(BufferedImageLoader.getImageByName("level1.png"));
+        LevelLoader.loadImageLevel(BufferedImageLoader.getImageByName("level1.png"), handler);
     }
 
     public synchronized void start() {
@@ -92,40 +94,13 @@ public class Game extends Canvas implements Runnable {
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
         //DRAWING
-        g.drawImage(BufferedImageLoader.getImageByName("bgsimple.png"), 0, 0, this);
-        g.drawImage(BufferedImageLoader.getImageByName("bg.png"), 0, 200, this);
+        g.drawImage(BufferedImageLoader.getImageByName("bg_1.png"), 0, 0, this);
+        g.drawImage(BufferedImageLoader.getImageByName("bg_2.png"), 0, 200, this);
         g2d.translate(camera.getX(), camera.getY());
         handler.render(g);
-        g2d.translate(-camera.getX(), -camera.getY());
 
         g.dispose();
         bs.show();
-    }
-
-    private void loadImageLevel(BufferedImage image) {
-        int w = image.getWidth();
-        int h = image.getHeight();
-
-        for (int xx = 0; xx < w; xx++)
-            for (int yy = 0; yy < h; yy++) {
-                int pixel = image.getRGB(xx, yy);
-                int red = (pixel >> 16) & 0xff;
-                int green = (pixel >> 8) & 0xff;
-                int blue = pixel & 0xff;
-
-                if (red == 255 && green == 0 && blue == 0)
-                    handler.addObject(new DeathTrap(xx * 32, yy * 32, ObjectId.DeathTrap));
-                if (red == 255 && green == 255 && blue == 255)
-                    handler.addObject(new Block(xx * 32, yy * 32, ObjectId.Block));
-                if (red == 255 && green == 255 && blue == 0)
-                    handler.addObject(new Coin(xx * 32, yy * 32, handler, ObjectId.Coin));
-                if (red == 128 && green == 0 && blue == 0)
-                    handler.addObject(new Pavement(xx * 32, yy * 32, ObjectId.Pavement));
-                if (red == 0 && green == 0 && blue == 214)
-                    handler.addObject(new Lamp(xx * 32, yy * 32, ObjectId.Lamp));
-                if (red == 0 && green == 139 && blue == 0)
-                    handler.addObject(new BlockUp(xx * 32, yy * 32, ObjectId.Block));
-            }
     }
 
     public static void main(String[] args) {

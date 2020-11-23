@@ -1,7 +1,8 @@
-package com.adrjan.platformer.objects;
+package com.adrjan.platformer.objects.decor;
 
-import com.adrjan.platformer.BufferedImageLoader;
-import com.adrjan.platformer.framework.ObjectId;
+import com.adrjan.platformer.framework.data_loaders.BufferedImageLoader;
+import com.adrjan.platformer.objects.ObjectId;
+import com.adrjan.platformer.objects.GameObject;
 
 import java.awt.*;
 import java.util.LinkedList;

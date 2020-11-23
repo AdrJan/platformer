@@ -1,11 +1,10 @@
-package com.adrjan.platformer.framework;
+package com.adrjan.platformer.framework.control;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
-import com.adrjan.platformer.Camera;
-import com.adrjan.platformer.Handler;
-import com.adrjan.platformer.objects.Player;
+import com.adrjan.platformer.framework.Handler;
+import com.adrjan.platformer.objects.player.Player;
 
 public class KeyInput extends KeyAdapter{
 

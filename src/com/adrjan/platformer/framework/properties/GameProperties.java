@@ -1,4 +1,4 @@
-package com.adrjan.platformer;
+package com.adrjan.platformer.framework.properties;
 
 public class GameProperties {
 

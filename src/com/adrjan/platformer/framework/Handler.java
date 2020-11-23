@@ -1,4 +1,4 @@
-package com.adrjan.platformer;
+package com.adrjan.platformer.framework;
 
 import com.adrjan.platformer.objects.GameObject;
 

@@ -1,10 +1,10 @@
-package com.adrjan.platformer.objects;
+package com.adrjan.platformer.objects.pick_ups;
 
-import com.adrjan.platformer.BufferedImageLoader;
-import com.adrjan.platformer.GameProperties;
-import com.adrjan.platformer.GameState;
-import com.adrjan.platformer.Handler;
-import com.adrjan.platformer.framework.ObjectId;
+import com.adrjan.platformer.framework.data_loaders.BufferedImageLoader;
+import com.adrjan.platformer.framework.state.GameState;
+import com.adrjan.platformer.framework.Handler;
+import com.adrjan.platformer.objects.ObjectId;
+import com.adrjan.platformer.objects.GameObject;
 
 import java.awt.*;
 import java.util.LinkedList;

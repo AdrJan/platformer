@@ -1,7 +1,10 @@
-package com.adrjan.platformer;
+package com.adrjan.platformer.framework.visual;
+
+import com.adrjan.platformer.framework.data_loaders.BufferedImageLoader;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Animations {
@@ -18,8 +21,7 @@ public class Animations {
     }
 
     public void setImages(String... imageNames) {
-        for (String imageName : imageNames)
-            images.add(imageName);
+        images.addAll(Arrays.asList(imageNames));
         imageListSize = images.size();
     }
 

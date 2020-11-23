@@ -1,4 +1,4 @@
-package com.adrjan.platformer;
+package com.adrjan.platformer.framework.data_loaders;
 
 import javax.imageio.ImageIO;
 import java.awt.geom.AffineTransform;

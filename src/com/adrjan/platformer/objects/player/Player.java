@@ -1,7 +1,15 @@
-package com.adrjan.platformer.objects;
+package com.adrjan.platformer.objects.player;
 
-import com.adrjan.platformer.*;
-import com.adrjan.platformer.framework.ObjectId;
+import com.adrjan.platformer.framework.properties.GameProperties;
+import com.adrjan.platformer.framework.state.GameState;
+import com.adrjan.platformer.framework.Handler;
+import com.adrjan.platformer.objects.ObjectId;
+import com.adrjan.platformer.framework.visual.Animations;
+import com.adrjan.platformer.framework.data_loaders.BufferedImageLoader;
+import com.adrjan.platformer.framework.visual.Camera;
+import com.adrjan.platformer.objects.Directions;
+import com.adrjan.platformer.objects.GameObject;
+import com.adrjan.platformer.objects.pick_ups.Coin;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -39,8 +47,9 @@ public class Player extends GameObject {
                 "bald_idle2.png"
         );
         animationsJump = new Animations(60);
-        animationsJump.setImages("bald_jump1.png");
-
+        animationsJump.setImages(
+                "bald_jump1.png"
+        );
         animationsMove = new Animations(10);
         animationsMove.setImages(
                 "bald_move1.png",
@@ -96,12 +105,6 @@ public class Player extends GameObject {
                 if (getBounds().intersects(tempObject.getBounds()) || getBoundsTop().intersects(tempObject.getBounds())) {
                     Coin coin = (Coin) tempObject;
                     coin.setTaken(true);
-                }
-            }
-
-            if (tempObject.getId() == ObjectId.DeathTrap) {
-                if (getBounds().intersects(tempObject.getBounds()) || getBoundsTop().intersects(tempObject.getBounds())) {
-                    checkLifes();
                 }
             }
         }
@@ -225,5 +228,14 @@ public class Player extends GameObject {
             x = 64;
             y = 690;
         }
+    }
+
+    public float approach(float G, float C, float diff) {
+        float D = G - C;
+        if (D > diff)
+            return C + diff;
+        if (D < -diff)
+            return C - diff;
+        return G;
     }
 }

@@ -1,5 +1,6 @@
-package com.adrjan.platformer;
+package com.adrjan.platformer.framework.visual;
 
+import com.adrjan.platformer.framework.Game;
 import com.adrjan.platformer.objects.GameObject;
 
 public class Camera {
