@@ -1,5 +1,8 @@
 package com.adrjan.platformer.objects;
 
+import com.adrjan.platformer.BufferedImageLoader;
+import com.adrjan.platformer.GameProperties;
+import com.adrjan.platformer.GameState;
 import com.adrjan.platformer.Handler;
 import com.adrjan.platformer.framework.ObjectId;
 
@@ -47,7 +50,7 @@ public class Coin extends GameObject {
             scaleD++;
 
             if (scaleA > 7) {
-                Player.score += 10;
+                GameState.playerScore += 10;
                 handler.removeObject(this);
             }
         }
@@ -71,13 +74,12 @@ public class Coin extends GameObject {
         yPoints[2] = (int) y + scaleC;
         xPoints[3] = (int) x + scaleD;
         yPoints[3] = (int) y + 8;
-        g.setColor(Color.yellow);
-        g.fillPolygon(xPoints, yPoints, nPoints);
+        g.drawImage(BufferedImageLoader.getImageByName("bottle.png"), (int) x,  (int)y, 64, 64, null);
     }
 
     @Override
     public Rectangle getBounds() {
         // TODO Auto-generated method stub
-        return new Rectangle((int) x, (int) y, 12, 16);
+        return new Rectangle((int) x, (int) y, 64, 64);
     }
 }

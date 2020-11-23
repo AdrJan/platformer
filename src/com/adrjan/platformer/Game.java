@@ -2,10 +2,7 @@ package com.adrjan.platformer;
 
 import com.adrjan.platformer.framework.KeyInput;
 import com.adrjan.platformer.framework.ObjectId;
-import com.adrjan.platformer.objects.Block;
-import com.adrjan.platformer.objects.Coin;
-import com.adrjan.platformer.objects.DeathTrap;
-import com.adrjan.platformer.objects.Player;
+import com.adrjan.platformer.objects.*;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
@@ -14,7 +11,6 @@ import java.awt.image.BufferedImage;
 public class Game extends Canvas implements Runnable {
 
     private boolean running = false;
-    private int counter = 0;
 
     public static int WIDTH, HEIGHT;
 
@@ -29,7 +25,7 @@ public class Game extends Canvas implements Runnable {
         handler = new Handler();
         camera = new Camera();
 
-        player = new Player(64, 690, handler, camera, ObjectId.Player);
+        player = new Player(0, 0, handler, camera, ObjectId.Player);
         this.addKeyListener(new KeyInput(handler, player));
         handler.addObject(player);
         loadImageLevel(BufferedImageLoader.getImageByName("level1.png"));
@@ -97,26 +93,10 @@ public class Game extends Canvas implements Runnable {
 
         //DRAWING
         g.drawImage(BufferedImageLoader.getImageByName("bgsimple.png"), 0, 0, this);
+        g.drawImage(BufferedImageLoader.getImageByName("bg.png"), 0, 200, this);
         g2d.translate(camera.getX(), camera.getY());
         handler.render(g);
         g2d.translate(-camera.getX(), -camera.getY());
-
-        g.setColor(Color.white);
-
-        g.setFont(new Font("Cooper Black", Font.PLAIN, 35));
-        g2d.drawString("Score:    " + Player.score, 550, 40);
-        g2d.drawString("Lifes: " + player.getLifes(), 30, 40);
-
-        if (counter < 100) {
-            g.setFont(new Font("Cooper Black", Font.PLAIN, counter));
-            g2d.drawString("GET READY!", 250 - counter * 2, 200);
-            counter++;
-        }
-
-        if (player.getLifes() == 0) {
-            g.setFont(new Font("Cooper Black", Font.PLAIN, 100));
-            g2d.drawString("GAME OVER", 70, HEIGHT / 2);
-        }
 
         g.dispose();
         bs.show();
@@ -139,6 +119,12 @@ public class Game extends Canvas implements Runnable {
                     handler.addObject(new Block(xx * 32, yy * 32, ObjectId.Block));
                 if (red == 255 && green == 255 && blue == 0)
                     handler.addObject(new Coin(xx * 32, yy * 32, handler, ObjectId.Coin));
+                if (red == 128 && green == 0 && blue == 0)
+                    handler.addObject(new Pavement(xx * 32, yy * 32, ObjectId.Pavement));
+                if (red == 0 && green == 0 && blue == 214)
+                    handler.addObject(new Lamp(xx * 32, yy * 32, ObjectId.Lamp));
+                if (red == 0 && green == 139 && blue == 0)
+                    handler.addObject(new BlockUp(xx * 32, yy * 32, ObjectId.Block));
             }
     }
 

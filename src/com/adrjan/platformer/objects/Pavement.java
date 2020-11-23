@@ -6,12 +6,12 @@ import com.adrjan.platformer.framework.ObjectId;
 import java.awt.*;
 import java.util.LinkedList;
 
-public class Block extends GameObject {
+public class Pavement extends GameObject {
 
-    private int width = 64;
-    private int height = 64;
+    private int width = 16;
+    private int height = 16;
 
-    public Block(float x, float y, ObjectId id) {
+    public Pavement(float x, float y, ObjectId id) {
         super(x, y, id);
     }
 
@@ -20,7 +20,7 @@ public class Block extends GameObject {
 
     public void render(Graphics g) {
         g.drawImage(
-                BufferedImageLoader.getImageByName(String.format("block1.png")),
+                BufferedImageLoader.getImageByName(String.format("pavement.png")),
                 (int) x, (int) y, width, height,
                 null
         );

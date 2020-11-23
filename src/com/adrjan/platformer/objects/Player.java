@@ -1,8 +1,6 @@
 package com.adrjan.platformer.objects;
 
-import com.adrjan.platformer.BufferedImageLoader;
-import com.adrjan.platformer.Camera;
-import com.adrjan.platformer.Handler;
+import com.adrjan.platformer.*;
 import com.adrjan.platformer.framework.ObjectId;
 
 import java.awt.*;
@@ -11,36 +9,61 @@ import java.util.LinkedList;
 
 public class Player extends GameObject {
 
-    private float width = 32, height = 64;
-    private float gravity = 0.12f;
+    private final float WIDTH = 128;
+    private final float HEIGHT = 128;
 
-    private final float MAX_SPEED = 10.0f;
-    public static int score = 0;
-    Player.directions dir = Player.directions.NO_DIR;
+    Directions dir = Directions.NO_DIR;
+    Directions lastDir = Directions.RIGHT;
+
     public boolean noKeyPressed = true;
     private boolean keyPressedA = false;
     private boolean keyPressedD = false;
     private boolean keyPressedW = false;
 
-    public enum directions {
-        LEFT, RIGHT, NO_DIR;
-    }
+    private final Handler handler;
+    private final Camera camera;
 
-    private Handler handler;
-    private Camera camera;
-    BufferedImage img;
+    private final Animations animationsIdle;
+    private final Animations animationsJump;
+    private final Animations animationsMove;
 
-    private int lifes = 3;
+    private BufferedImage displayedImage;
 
     public Player(float x, float y, Handler handler, Camera camera, ObjectId id) {
         super(x, y, id);
         this.handler = handler;
         this.camera = camera;
+        animationsIdle = new Animations(15);
+        animationsIdle.setImages(
+                "bald_idle1.png",
+                "bald_idle2.png"
+        );
+        animationsJump = new Animations(60);
+        animationsJump.setImages("bald_jump1.png");
+
+        animationsMove = new Animations(10);
+        animationsMove.setImages(
+                "bald_move1.png",
+                "bald_move2.png"
+        );
     }
 
     public void tick(LinkedList<GameObject> object) {
         movement();
         Collision(object);
+        animate();
+    }
+
+    public void animate() {
+        if(this.isJumping())
+            displayedImage = animationsJump.getImage();
+        else if(this.velX != 0)
+            displayedImage = animationsMove.getImage();
+        else
+            displayedImage = animationsIdle.getImage();
+
+        if(velX < 0 || lastDir == Directions.LEFT)
+            displayedImage = BufferedImageLoader.rotateImageHorizontally(displayedImage);
     }
 
     private void Collision(LinkedList<GameObject> object) {
@@ -49,39 +72,23 @@ public class Player extends GameObject {
 
             if (tempObject.getId() == ObjectId.Block) {
                 if (getBoundsTop().intersects(tempObject.getBounds())) {
-                    y = tempObject.getY() + (height / 2);
+                    y = tempObject.getY() + (HEIGHT / 2);
                     velY = 0;
                 }
                 if (getBounds().intersects(tempObject.getBounds())) {
-                    y = tempObject.getY() - height + 1;
+                    y = tempObject.getY() - HEIGHT + 1;
                     velY = 0;
                     falling = false;
                     jumping = false;
                 } else
                     falling = true;
                 if (getBoundsRight().intersects(tempObject.getBounds())) {
-                    x = tempObject.getX() - width;
+                    x = tempObject.getX() - WIDTH;
                     velX = 0;
                 }
                 if (getBoundsLeft().intersects(tempObject.getBounds())) {
-                    x = tempObject.getX() + width;
+                    x = tempObject.getX() + WIDTH;
                     velX = 0;
-                }
-            }
-
-            if (tempObject.getId() == ObjectId.EnemyTriangle) {
-
-                if (getBoundsTop().intersects(tempObject.getBounds())) {
-                    checkLifes();
-                }
-                if (getBounds().intersects(tempObject.getBounds())) {
-                    //this.velY = -3;
-                }
-                if (getBoundsRight().intersects(tempObject.getBounds())) {
-                    //checkLifes();
-                }
-                if (getBoundsLeft().intersects(tempObject.getBounds())) {
-                    //checkLifes();
                 }
             }
 
@@ -113,20 +120,22 @@ public class Player extends GameObject {
         }
 
         if (falling || jumping) {
-            velY += gravity;
+            velY += GameProperties.PLAYER_GRAVITY;
 
-            if (velY > MAX_SPEED)
-                velY = MAX_SPEED;
+            if (velY > GameProperties.PLAYER_MAX_SPEED)
+                velY = GameProperties.PLAYER_MAX_SPEED;
         }
 
         if (this.keyPressedD) {
             this.setVelX(this.approach(5, this.velX, 0.30f));
-            this.setDir(Player.directions.RIGHT);
+            this.setDir(Directions.RIGHT);
+            this.lastDir = Directions.RIGHT;
             this.noKeyPressed = false;
         }
         if (this.keyPressedA) {
             this.setVelX(this.approach(-5, this.velX, 0.30f));
-            this.setDir(Player.directions.LEFT);
+            this.setDir(Directions.LEFT);
+            this.lastDir = Directions.LEFT;
             this.noKeyPressed = false;
         }
         if (this.keyPressedW && !this.jumping) {
@@ -136,41 +145,42 @@ public class Player extends GameObject {
         }
         if (this.keyPressedW && this.keyPressedD) {
             this.setVelX(this.approach(5, this.velX, 0.30f));
-            this.setDir(Player.directions.RIGHT);
+            this.setDir(Directions.RIGHT);
             this.noKeyPressed = false;
         }
         if (this.keyPressedW && this.keyPressedA) {
             this.setVelX(this.approach(-5, this.velX, 0.30f));
-            this.setDir(Player.directions.LEFT);
+            this.setDir(Directions.LEFT);
             this.noKeyPressed = false;
         }
         if (!this.keyPressedA && !this.keyPressedD) {
-            this.setDir(Player.directions.NO_DIR);
+            this.setVelX(this.approach(0, this.velX, 0.30f));
+            this.setDir(Directions.NO_DIR);
             this.noKeyPressed = true;
         }
     }
 
     public void render(Graphics g) {
-        g.drawImage(BufferedImageLoader.getImageByName("robo.gif"), (int) x, (int) y, 32, 64, null);
+        g.drawImage(displayedImage, (int) x, (int) y, 128, 128, null);
     }
 
     public Rectangle getBounds() {
-        return new Rectangle(((int) ((int) x + (width / 4))), (int) ((int) y + (height / 2)), (int) width / 2, (int) height / 2);
+        return new Rectangle(((int) ((int) x + (WIDTH / 4))), (int) ((int) y + (HEIGHT / 2)), (int) WIDTH / 2, (int) HEIGHT / 2);
     }
 
     public Rectangle getBoundsTop() {
-        return new Rectangle(((int) ((int) x + (width / 4))), (int) y, (int) width / 2, (int) height / 2);
+        return new Rectangle(((int) ((int) x + (WIDTH / 4))), (int) y, (int) WIDTH / 2, (int) HEIGHT / 2);
     }
 
     public Rectangle getBoundsRight() {
-        return new Rectangle((int) ((int) x + width - 5), (int) y + 5, (int) 5, (int) height - 10);
+        return new Rectangle((int) ((int) x + WIDTH - 5), (int) y + 5, (int) 5, (int) HEIGHT - 10);
     }
 
     public Rectangle getBoundsLeft() {
-        return new Rectangle((int) x, (int) y + 5, (int) width, (int) height - 10);
+        return new Rectangle((int) x, (int) y + 5, (int) WIDTH, (int) HEIGHT - 10);
     }
 
-    public void setDir(Player.directions dir) {
+    public void setDir(Directions dir) {
         this.dir = dir;
     }
 
@@ -206,18 +216,10 @@ public class Player extends GameObject {
         this.keyPressedW = keyPressedW;
     }
 
-    public int getLifes() {
-        return lifes;
-    }
-
-    public void setLifes(int lifes) {
-        this.lifes = lifes;
-    }
-
     private void checkLifes() {
-        if (--lifes <= 0) {
+        if (--GameState.playerLife <= 0) {
             handler.removeObject(this);
-            lifes = 0;
+            GameState.playerLife = 0;
         } else {
             camera.resetCamera();
             x = 64;

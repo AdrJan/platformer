@@ -6,12 +6,6 @@ public enum ObjectId {
 	Block(),
 	DeathTrap(),
 	Coin(),
-	Firework(),
-	GrassUpBlock(),
-	EnemySquare(),
-	OneUp(),
-	EnemyBall(),
-	EnemyTriangle(),
-	Sprinkle();
-	
+	Pavement(),
+	Lamp()
 }
