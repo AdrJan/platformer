@@ -95,7 +95,7 @@ public class Game extends Canvas implements Runnable {
 
         //DRAWING
         g.drawImage(BufferedImageLoader.getImageByName("bg_1.png"), 0, 0, this);
-        g.drawImage(BufferedImageLoader.getImageByName("bg_2.png"), 0, 200, this);
+        g.drawImage(BufferedImageLoader.getImageByName("bg_2.png"), 0, 100, this);
         g2d.translate(camera.getX(), camera.getY());
         handler.render(g);
 

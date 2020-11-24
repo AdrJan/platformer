@@ -23,13 +23,13 @@ public class LevelLoader {
                 int blue = pixel & 0xff;
 
                 if (red == 255 && green == 255 && blue == 255)
-                    handler.addObject(new Block(xx * 32, yy * 32, ObjectId.Block));
+                    handler.addObject(new Block(xx * 64, yy * 64, ObjectId.Block));
                 if (red == 255 && green == 255 && blue == 0)
-                    handler.addObject(new Coin(xx * 32, yy * 32, handler, ObjectId.Coin));
+                    handler.addObject(new Coin(xx * 64, yy * 64, handler, ObjectId.Coin));
                 if (red == 0 && green == 0 && blue == 214)
-                    handler.addObject(new Lamp(xx * 32, yy * 32, ObjectId.Lamp));
+                    handler.addObject(new Lamp(xx * 64, yy * 64, ObjectId.Lamp));
                 if (red == 0 && green == 139 && blue == 0)
-                    handler.addObject(new BlockUp(xx * 32, yy * 32, ObjectId.Block));
+                    handler.addObject(new BlockUp(xx * 64, yy * 64, ObjectId.Block));
             }
     }
 }

@@ -1,14 +1,14 @@
 package com.adrjan.platformer.objects.player;
 
+import com.adrjan.platformer.framework.Handler;
+import com.adrjan.platformer.framework.data_loaders.BufferedImageLoader;
 import com.adrjan.platformer.framework.properties.GameProperties;
 import com.adrjan.platformer.framework.state.GameState;
-import com.adrjan.platformer.framework.Handler;
-import com.adrjan.platformer.objects.ObjectId;
 import com.adrjan.platformer.framework.visual.Animations;
-import com.adrjan.platformer.framework.data_loaders.BufferedImageLoader;
 import com.adrjan.platformer.framework.visual.Camera;
 import com.adrjan.platformer.objects.Directions;
 import com.adrjan.platformer.objects.GameObject;
+import com.adrjan.platformer.objects.ObjectId;
 import com.adrjan.platformer.objects.pick_ups.Coin;
 
 import java.awt.*;
@@ -19,6 +19,8 @@ public class Player extends GameObject {
 
     private final float WIDTH = 128;
     private final float HEIGHT = 128;
+
+    private final float MARGIN = 10;
 
     Directions dir = Directions.NO_DIR;
     Directions lastDir = Directions.RIGHT;
@@ -64,14 +66,14 @@ public class Player extends GameObject {
     }
 
     public void animate() {
-        if(this.isJumping())
+        if (this.isJumping())
             displayedImage = animationsJump.getImage();
-        else if(this.velX != 0)
+        else if (this.velX != 0)
             displayedImage = animationsMove.getImage();
         else
             displayedImage = animationsIdle.getImage();
 
-        if(velX < 0 || lastDir == Directions.LEFT)
+        if (velX < 0 || lastDir == Directions.LEFT)
             displayedImage = BufferedImageLoader.rotateImageHorizontally(displayedImage);
     }
 
@@ -93,11 +95,11 @@ public class Player extends GameObject {
                     falling = true;
                 if (getBoundsRight().intersects(tempObject.getBounds())) {
                     x = tempObject.getX() - WIDTH;
-                    velX = 0;
+                    velX = -2;
                 }
                 if (getBoundsLeft().intersects(tempObject.getBounds())) {
-                    x = tempObject.getX() + WIDTH;
-                    velX = 0;
+                    x = tempObject.getX() + 64;
+                    velX = 2;
                 }
             }
 
@@ -176,11 +178,11 @@ public class Player extends GameObject {
     }
 
     public Rectangle getBoundsRight() {
-        return new Rectangle((int) ((int) x + WIDTH - 5), (int) y + 5, (int) 5, (int) HEIGHT - 10);
+        return new Rectangle((int) ((int) x + WIDTH  - 10 - MARGIN), (int) y + 5, 5, (int) HEIGHT - 10);
     }
 
     public Rectangle getBoundsLeft() {
-        return new Rectangle((int) x, (int) y + 5, (int) WIDTH, (int) HEIGHT - 10);
+        return new Rectangle((int) x, (int) y + 5, 5, (int) HEIGHT - 10);
     }
 
     public void setDir(Directions dir) {
