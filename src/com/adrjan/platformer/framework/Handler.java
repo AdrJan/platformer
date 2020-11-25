@@ -7,29 +7,23 @@ import java.util.LinkedList;
 
 public class Handler {
 
-    public LinkedList<GameObject> object = new LinkedList<>();
+    public static LinkedList<GameObject> gameObjects = new LinkedList<>();
 
-    private GameObject tempObject;
-
-    public void tick() {
-        for (int i = 0; i < object.size(); i++) {
-            tempObject = object.get(i);
-            tempObject.tick(object);
-        }
+    public static void tick() {
+        for (int i = 0; i < gameObjects.size(); i++)
+            gameObjects.get(i).tick(gameObjects);
     }
 
-    public void render(Graphics g) {
-        for (GameObject gameObject : object) {
-            tempObject = gameObject;
-            tempObject.render(g);
-        }
+    public static void render(Graphics g) {
+        for (GameObject gameObject : gameObjects)
+            gameObject.render(g);
     }
 
-    public void addObject(GameObject object) {
-        this.object.add(object);
+    public static void addObject(GameObject object) {
+        gameObjects.add(object);
     }
 
-    public void removeObject(GameObject object) {
-        this.object.remove(object);
+    public static void removeObject(GameObject object) {
+        gameObjects.remove(object);
     }
 }

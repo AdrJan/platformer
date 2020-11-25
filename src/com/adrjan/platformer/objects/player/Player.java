@@ -3,9 +3,7 @@ package com.adrjan.platformer.objects.player;
 import com.adrjan.platformer.framework.Handler;
 import com.adrjan.platformer.framework.data_loaders.BufferedImageLoader;
 import com.adrjan.platformer.framework.properties.GameProperties;
-import com.adrjan.platformer.framework.state.GameState;
 import com.adrjan.platformer.framework.visual.Animations;
-import com.adrjan.platformer.framework.visual.Camera;
 import com.adrjan.platformer.objects.Directions;
 import com.adrjan.platformer.objects.GameObject;
 import com.adrjan.platformer.objects.ObjectId;
@@ -20,8 +18,6 @@ public class Player extends GameObject {
     private final float WIDTH = 128;
     private final float HEIGHT = 128;
 
-    private final float MARGIN = 10;
-
     Directions dir = Directions.NO_DIR;
     Directions lastDir = Directions.RIGHT;
 
@@ -30,19 +26,14 @@ public class Player extends GameObject {
     private boolean keyPressedD = false;
     private boolean keyPressedW = false;
 
-    private final Handler handler;
-    private final Camera camera;
-
     private final Animations animationsIdle;
     private final Animations animationsJump;
     private final Animations animationsMove;
 
     private BufferedImage displayedImage;
 
-    public Player(float x, float y, Handler handler, Camera camera, ObjectId id) {
+    public Player(float x, float y, ObjectId id) {
         super(x, y, id);
-        this.handler = handler;
-        this.camera = camera;
         animationsIdle = new Animations(15);
         animationsIdle.setImages(
                 "bald_idle1.png",
@@ -59,9 +50,9 @@ public class Player extends GameObject {
         );
     }
 
-    public void tick(LinkedList<GameObject> object) {
+    public void tick(LinkedList<GameObject> objects) {
         movement();
-        Collision(object);
+        Collision(objects);
         animate();
     }
 
@@ -79,7 +70,7 @@ public class Player extends GameObject {
 
     private void Collision(LinkedList<GameObject> object) {
         for (int i = 0; i < object.size(); i++) {
-            GameObject tempObject = handler.object.get(i);
+            GameObject tempObject = Handler.gameObjects.get(i);
 
             if (tempObject.getId() == ObjectId.Block) {
                 if (getBoundsTop().intersects(tempObject.getBounds())) {
@@ -120,41 +111,38 @@ public class Player extends GameObject {
             velX = 0;
             x = 0;
         }
-        if (y >= 920) {
-            checkLifes();
-        }
 
         if (falling || jumping) {
             velY += GameProperties.PLAYER_GRAVITY;
 
-            if (velY > GameProperties.PLAYER_MAX_SPEED)
-                velY = GameProperties.PLAYER_MAX_SPEED;
+            if (velY > GameProperties.PLAYER_MAX_FALL_SPEED)
+                velY = GameProperties.PLAYER_MAX_FALL_SPEED;
         }
 
         if (this.keyPressedD) {
-            this.setVelX(this.approach(5, this.velX, 0.30f));
+            this.setVelX(this.approach(GameProperties.PLAYER_SPEED, this.velX, 0.30f));
             this.setDir(Directions.RIGHT);
             this.lastDir = Directions.RIGHT;
             this.noKeyPressed = false;
         }
         if (this.keyPressedA) {
-            this.setVelX(this.approach(-5, this.velX, 0.30f));
+            this.setVelX(this.approach(-GameProperties.PLAYER_SPEED, this.velX, 0.30f));
             this.setDir(Directions.LEFT);
             this.lastDir = Directions.LEFT;
             this.noKeyPressed = false;
         }
         if (this.keyPressedW && !this.jumping) {
             y = y - 1;
-            velY = -5;
+            velY = -GameProperties.PLAYER_JUMP_SPEED;
             this.setJumping(true);
         }
         if (this.keyPressedW && this.keyPressedD) {
-            this.setVelX(this.approach(5, this.velX, 0.30f));
+            this.setVelX(this.approach(GameProperties.PLAYER_SPEED, this.velX, 0.30f));
             this.setDir(Directions.RIGHT);
             this.noKeyPressed = false;
         }
         if (this.keyPressedW && this.keyPressedA) {
-            this.setVelX(this.approach(-5, this.velX, 0.30f));
+            this.setVelX(this.approach(-GameProperties.PLAYER_SPEED, this.velX, 0.30f));
             this.setDir(Directions.LEFT);
             this.noKeyPressed = false;
         }
@@ -178,58 +166,11 @@ public class Player extends GameObject {
     }
 
     public Rectangle getBoundsRight() {
-        return new Rectangle((int) ((int) x + WIDTH  - 10 - MARGIN), (int) y + 5, 5, (int) HEIGHT - 10);
+        return new Rectangle((int) ((int) x + WIDTH - 10), (int) y + 5, 5, (int) HEIGHT - 10);
     }
 
     public Rectangle getBoundsLeft() {
         return new Rectangle((int) x, (int) y + 5, 5, (int) HEIGHT - 10);
-    }
-
-    public void setDir(Directions dir) {
-        this.dir = dir;
-    }
-
-    public boolean isNoKeyPressed() {
-        return noKeyPressed;
-    }
-
-    public void setNoKeyPressed(boolean noKeyPressed) {
-        this.noKeyPressed = noKeyPressed;
-    }
-
-    public boolean isKeyPressedA() {
-        return keyPressedA;
-    }
-
-    public void setKeyPressedA(boolean keyPressedA) {
-        this.keyPressedA = keyPressedA;
-    }
-
-    public boolean isKeyPressedD() {
-        return keyPressedD;
-    }
-
-    public void setKeyPressedD(boolean keyPressedD) {
-        this.keyPressedD = keyPressedD;
-    }
-
-    public boolean isKeyPressedW() {
-        return keyPressedW;
-    }
-
-    public void setKeyPressedW(boolean keyPressedW) {
-        this.keyPressedW = keyPressedW;
-    }
-
-    private void checkLifes() {
-        if (--GameState.playerLife <= 0) {
-            handler.removeObject(this);
-            GameState.playerLife = 0;
-        } else {
-            camera.resetCamera();
-            x = 64;
-            y = 690;
-        }
     }
 
     public float approach(float G, float C, float diff) {
@@ -239,5 +180,21 @@ public class Player extends GameObject {
         if (D < -diff)
             return C - diff;
         return G;
+    }
+
+    public void setDir(Directions dir) {
+        this.dir = dir;
+    }
+
+    public void setKeyPressedA(boolean keyPressedA) {
+        this.keyPressedA = keyPressedA;
+    }
+
+    public void setKeyPressedD(boolean keyPressedD) {
+        this.keyPressedD = keyPressedD;
+    }
+
+    public void setKeyPressedW(boolean keyPressedW) {
+        this.keyPressedW = keyPressedW;
     }
 }

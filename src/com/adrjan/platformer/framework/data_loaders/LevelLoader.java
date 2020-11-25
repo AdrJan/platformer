@@ -6,12 +6,15 @@ import com.adrjan.platformer.objects.blocks.Block;
 import com.adrjan.platformer.objects.blocks.BlockUp;
 import com.adrjan.platformer.objects.decor.Lamp;
 import com.adrjan.platformer.objects.pick_ups.Coin;
+import com.adrjan.platformer.objects.player.Player;
 
 import java.awt.image.BufferedImage;
 
 public class LevelLoader {
 
-    public static void loadImageLevel(BufferedImage image, Handler handler) {
+    private static Player player;
+
+    public static void loadImageLevel(BufferedImage image) {
         int w = image.getWidth();
         int h = image.getHeight();
 
@@ -23,13 +26,21 @@ public class LevelLoader {
                 int blue = pixel & 0xff;
 
                 if (red == 255 && green == 255 && blue == 255)
-                    handler.addObject(new Block(xx * 64, yy * 64, ObjectId.Block));
+                    Handler.addObject(new Block(xx * 64, yy * 64, ObjectId.Block));
                 if (red == 255 && green == 255 && blue == 0)
-                    handler.addObject(new Coin(xx * 64, yy * 64, handler, ObjectId.Coin));
+                    Handler.addObject(new Coin(xx * 64, yy * 64, ObjectId.Coin));
                 if (red == 0 && green == 0 && blue == 214)
-                    handler.addObject(new Lamp(xx * 64, yy * 64, ObjectId.Lamp));
+                    Handler.addObject(new Lamp(xx * 64, yy * 64, ObjectId.Lamp));
                 if (red == 0 && green == 139 && blue == 0)
-                    handler.addObject(new BlockUp(xx * 64, yy * 64, ObjectId.Block));
+                    Handler.addObject(new BlockUp(xx * 64, yy * 64, ObjectId.Block));
+                if (red == 127 && green == 127 && blue == 127) {
+                    player = new Player(xx * 64, yy * 64, ObjectId.Player);
+                    Handler.addObject(player);
+                }
             }
+    }
+
+    public static Player getPlayer() {
+        return player;
     }
 }
