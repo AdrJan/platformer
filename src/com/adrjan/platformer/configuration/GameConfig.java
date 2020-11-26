@@ -1,6 +1,6 @@
-package com.adrjan.platformer.framework.properties;
+package com.adrjan.platformer.configuration;
 
-public class GameProperties {
+public class GameConfig {
 
     public static float PLAYER_GRAVITY = 0.12f;
     public static float PLAYER_MAX_FALL_SPEED = 10.0f;

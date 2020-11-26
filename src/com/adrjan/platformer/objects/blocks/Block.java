@@ -14,6 +14,8 @@ public class Block extends GameObject {
 
     public Block(float x, float y, ObjectId id) {
         super(x, y, id);
+        super.height = height;
+        super.width = width;
     }
 
     public void tick(LinkedList<GameObject> object) {

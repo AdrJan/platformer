@@ -1,8 +1,8 @@
 package com.adrjan.platformer.objects.player;
 
+import com.adrjan.platformer.configuration.GameConfig;
 import com.adrjan.platformer.framework.Handler;
 import com.adrjan.platformer.framework.data_loaders.BufferedImageLoader;
-import com.adrjan.platformer.framework.properties.GameProperties;
 import com.adrjan.platformer.framework.visual.Animations;
 import com.adrjan.platformer.objects.Directions;
 import com.adrjan.platformer.objects.GameObject;
@@ -13,7 +13,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 
-public class Player extends GameObject {
+public class Player extends GameObject  {
 
     private final float WIDTH = 128;
     private final float HEIGHT = 128;
@@ -31,6 +31,9 @@ public class Player extends GameObject {
     private final Animations animationsMove;
 
     private BufferedImage displayedImage;
+
+    protected boolean falling = true;
+    protected boolean jumping = false;
 
     public Player(float x, float y, ObjectId id) {
         super(x, y, id);
@@ -51,15 +54,15 @@ public class Player extends GameObject {
     }
 
     public void tick(LinkedList<GameObject> objects) {
-        movement();
-        Collision(objects);
+        move();
+        collision(objects);
         animate();
     }
 
     public void animate() {
         if (this.isJumping())
             displayedImage = animationsJump.getImage();
-        else if (this.velX != 0)
+        else if (this.velX != 0.0)
             displayedImage = animationsMove.getImage();
         else
             displayedImage = animationsIdle.getImage();
@@ -68,7 +71,7 @@ public class Player extends GameObject {
             displayedImage = BufferedImageLoader.rotateImageHorizontally(displayedImage);
     }
 
-    private void Collision(LinkedList<GameObject> object) {
+    private void collision(LinkedList<GameObject> object) {
         for (int i = 0; i < object.size(); i++) {
             GameObject tempObject = Handler.gameObjects.get(i);
 
@@ -85,12 +88,12 @@ public class Player extends GameObject {
                 } else
                     falling = true;
                 if (getBoundsRight().intersects(tempObject.getBounds())) {
-                    x = tempObject.getX() - WIDTH;
-                    velX = -2;
+                    x = tempObject.getX() - width;
+                    velX = 0;
                 }
                 if (getBoundsLeft().intersects(tempObject.getBounds())) {
-                    x = tempObject.getX() + 64;
-                    velX = 2;
+                    velX = 0;
+                    x = tempObject.getX() + tempObject.getWidth();
                 }
             }
 
@@ -103,7 +106,7 @@ public class Player extends GameObject {
         }
     }
 
-    private void movement() {
+    private void move() {
         x += velX;
         y += velY;
 
@@ -113,36 +116,36 @@ public class Player extends GameObject {
         }
 
         if (falling || jumping) {
-            velY += GameProperties.PLAYER_GRAVITY;
+            velY += GameConfig.PLAYER_GRAVITY;
 
-            if (velY > GameProperties.PLAYER_MAX_FALL_SPEED)
-                velY = GameProperties.PLAYER_MAX_FALL_SPEED;
+            if (velY > GameConfig.PLAYER_MAX_FALL_SPEED)
+                velY = GameConfig.PLAYER_MAX_FALL_SPEED;
         }
 
         if (this.keyPressedD) {
-            this.setVelX(this.approach(GameProperties.PLAYER_SPEED, this.velX, 0.30f));
+            this.setVelX(this.approach(GameConfig.PLAYER_SPEED, this.velX, 0.30f));
             this.setDir(Directions.RIGHT);
             this.lastDir = Directions.RIGHT;
             this.noKeyPressed = false;
         }
         if (this.keyPressedA) {
-            this.setVelX(this.approach(-GameProperties.PLAYER_SPEED, this.velX, 0.30f));
+            this.setVelX(this.approach(-GameConfig.PLAYER_SPEED, this.velX, 0.30f));
             this.setDir(Directions.LEFT);
             this.lastDir = Directions.LEFT;
             this.noKeyPressed = false;
         }
         if (this.keyPressedW && !this.jumping) {
             y = y - 1;
-            velY = -GameProperties.PLAYER_JUMP_SPEED;
+            velY = -GameConfig.PLAYER_JUMP_SPEED;
             this.setJumping(true);
         }
         if (this.keyPressedW && this.keyPressedD) {
-            this.setVelX(this.approach(GameProperties.PLAYER_SPEED, this.velX, 0.30f));
+            this.setVelX(approach(GameConfig.PLAYER_SPEED, this.velX, 0.30f));
             this.setDir(Directions.RIGHT);
             this.noKeyPressed = false;
         }
         if (this.keyPressedW && this.keyPressedA) {
-            this.setVelX(this.approach(-GameProperties.PLAYER_SPEED, this.velX, 0.30f));
+            this.setVelX(approach(-GameConfig.PLAYER_SPEED, this.velX, 0.30f));
             this.setDir(Directions.LEFT);
             this.noKeyPressed = false;
         }
@@ -166,11 +169,11 @@ public class Player extends GameObject {
     }
 
     public Rectangle getBoundsRight() {
-        return new Rectangle((int) ((int) x + WIDTH - 10), (int) y + 5, 5, (int) HEIGHT - 10);
+        return new Rectangle((int) ((int) x + WIDTH - 20), (int) y + 10, 5, (int) HEIGHT - 20);
     }
 
     public Rectangle getBoundsLeft() {
-        return new Rectangle((int) x, (int) y + 5, 5, (int) HEIGHT - 10);
+        return new Rectangle((int) x + 20, (int) y + 10, 5, (int) HEIGHT - 20);
     }
 
     public float approach(float G, float C, float diff) {
