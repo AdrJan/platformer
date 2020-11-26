@@ -5,20 +5,16 @@ import com.adrjan.platformer.objects.GameObject;
 
 public class Camera {
 
-    static Camera camera;
     private static float x, y;
+    private static final int HEIGHT_MARGIN = 50;
 
-    public static Camera getCamera() {
-        if (camera == null) {
-            camera = new Camera();
-        }
-        return camera;
+    private Camera() {
+
     }
 
     public static void tick(GameObject player) {
-        if (player.getX() > 400)
-            x = -player.getX() + Game.WIDTH / 2;
-        y = -300;
+        x = (player.getX() > Game.WIDTH / 2) ? -player.getX() + Game.WIDTH / 2 : x;
+        y = (player.getY() < Game.HEIGHT + HEIGHT_MARGIN) ? -player.getY() + Game.HEIGHT / 2 : y;
     }
 
     public void resetCamera() {
