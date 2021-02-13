@@ -11,12 +11,13 @@ import java.awt.image.BufferStrategy;
 
 public class Game extends Canvas implements Runnable {
 
-    public static int WIDTH, HEIGHT;
+    public int windowWidth;
+    public int windowHeight;
     private boolean running = false;
 
     private void init() {
-        WIDTH = getWidth();
-        HEIGHT = getHeight();
+        windowWidth = getWidth();
+        windowHeight = getHeight();
 
         LevelLoader.loadImageLevel(BufferedImageLoader.getImageByName("level1.png"));
         this.addKeyListener(new KeyInput(LevelLoader.getPlayer()));
@@ -37,27 +38,15 @@ public class Game extends Canvas implements Runnable {
         double amountOfTicks = 60.0;
         double ns = 1000000000 / amountOfTicks;
         double delta = 0;
-        long timer = System.currentTimeMillis();
-        int updates = 0;
-        int frames = 0;
         while (running) {
             long now = System.nanoTime();
             delta += (now - lastTime) / ns;
             lastTime = now;
             while (delta >= 1) {
                 tick();
-                updates++;
                 delta--;
             }
             render();
-            frames++;
-
-            if (System.currentTimeMillis() - timer > 1000) {
-                timer += 1000;
-                System.out.println("FPS: " + frames + " TICKS: " + updates);
-                frames = 0;
-                updates = 0;
-            }
         }
     }
 
@@ -65,7 +54,7 @@ public class Game extends Canvas implements Runnable {
         Handler.tick();
         for (int i = 0; i < Handler.gameObjects.size(); i++)
             if (Handler.gameObjects.get(i) instanceof Player)
-                Camera.tick(Handler.gameObjects.get(i));
+                Camera.tick(this, Handler.gameObjects.get(i));
     }
 
     private void render() {

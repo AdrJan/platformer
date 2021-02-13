@@ -8,20 +8,23 @@ import com.adrjan.platformer.objects.Directions;
 import com.adrjan.platformer.objects.GameObject;
 import com.adrjan.platformer.objects.ObjectId;
 import com.adrjan.platformer.objects.pick_ups.Coin;
+import com.adrjan.platformer.objects.properties.Animated;
+import com.adrjan.platformer.objects.properties.Movable;
+import com.adrjan.platformer.objects.properties.Renderable;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.LinkedList;
+import java.util.List;
 
-public class Player extends GameObject {
+public class Player extends GameObject implements Renderable, Animated, Movable {
 
-    private final float WIDTH = 128;
-    private final float HEIGHT = 128;
+    private static final int WIDTH = 128;
+    private static final int HEIGHT = 128;
+    private static final int BORDER_WIDTH = 20;
 
     Directions dir = Directions.NO_DIR;
     Directions lastDir = Directions.RIGHT;
 
-    public boolean noKeyPressed = true;
     private boolean keyPressedA = false;
     private boolean keyPressedD = false;
     private boolean keyPressedW = false;
@@ -31,9 +34,6 @@ public class Player extends GameObject {
     private final Animations animationsMove;
 
     private BufferedImage displayedImage;
-
-    protected boolean jumping = false;
-    protected boolean falling = true;
 
     public Player(float x, float y, ObjectId id) {
         super(x, y, id);
@@ -53,9 +53,9 @@ public class Player extends GameObject {
         );
     }
 
-    public void tick(LinkedList<GameObject> objects) {
+    public void tick(List<GameObject> objects) {
         move();
-        collision(objects);
+        collide(objects);
         animate();
     }
 
@@ -71,42 +71,44 @@ public class Player extends GameObject {
             displayedImage = BufferedImageLoader.rotateImageHorizontally(displayedImage);
     }
 
-    private void collision(LinkedList<GameObject> object) {
+    private void collide(List<GameObject> object) {
         for (int i = 0; i < object.size(); i++) {
             GameObject otherObject = Handler.gameObjects.get(i);
-
-            if (otherObject.getId() == ObjectId.Block) {
-                if (getBoundsTop().intersects(otherObject.getBounds())) {
-                    y += velY + 2;
-                    velY = 0;
-                }
-                if (getBoundsBottom().intersects(otherObject.getBounds())) {
-                    y = otherObject.getY() - HEIGHT;
-                    velY = 0;
-                    falling = false;
-                    jumping = false;
-                } else
-                    falling = true;
-                if (getBoundsRight().intersects(otherObject.getBounds())) {
-                    x = otherObject.getX() - WIDTH;
-                    velX = 0;
-                }
-                if (getBoundsLeft().intersects(otherObject.getBounds())) {
-                    x = otherObject.getX() + 64;
-                    velX = 0;
-                }
-            }
-
-            if (otherObject.getId() == ObjectId.Coin) {
-                if (getBounds().intersects(otherObject.getBounds()) || getBoundsTop().intersects(otherObject.getBounds())) {
-                    Coin coin = (Coin) otherObject;
-                    coin.setTaken(true);
-                }
+            switch (otherObject.getId()) {
+                case Block:
+                    if (getBoundsTop().intersects(otherObject.getBounds())) {
+                        y += velY + 2;
+                        velY = 0;
+                    }
+                    if (getBoundsBottom().intersects(otherObject.getBounds())) {
+                        y = otherObject.getY() - HEIGHT;
+                        velY = 0;
+                        falling = false;
+                        jumping = false;
+                    } else
+                        falling = true;
+                    if (getBoundsRight().intersects(otherObject.getBounds())) {
+                        x = otherObject.getX() - WIDTH;
+                        velX = 0;
+                    }
+                    if (getBoundsLeft().intersects(otherObject.getBounds())) {
+                        x = otherObject.getX() + 64;
+                        velX = 0;
+                    }
+                    break;
+                case Coin:
+                    if(getBounds().intersects(otherObject.getBounds())) {
+                        Coin coin = (Coin) otherObject;
+                        coin.setTaken(true);
+                    }
+                    break;
+                default:
+                    break;
             }
         }
     }
 
-    private void move() {
+    public void move() {
         x += velX;
         y += velY;
 
@@ -114,8 +116,6 @@ public class Player extends GameObject {
             velX = 0;
             x = 0;
         }
-
-        System.out.println(falling + " " + jumping + " " + velX + " " + x);
 
         if (falling || jumping) {
             velY += GameConfig.PLAYER_GRAVITY;
@@ -130,22 +130,17 @@ public class Player extends GameObject {
             this.setVelX(this.approach(GameConfig.PLAYER_SPEED, this.velX, 0.30f));
             this.setDir(Directions.RIGHT);
             this.lastDir = Directions.RIGHT;
-            this.noKeyPressed = false;
         }
         if (this.keyPressedA) {
             this.setVelX(this.approach(-GameConfig.PLAYER_SPEED, this.velX, 0.30f));
             this.setDir(Directions.LEFT);
             this.lastDir = Directions.LEFT;
-            this.noKeyPressed = false;
         }
         if (!this.keyPressedA && !this.keyPressedD) {
             this.setVelX(this.approach(0, this.velX, 0.30f));
             this.setDir(Directions.NO_DIR);
-            this.noKeyPressed = true;
         }
     }
-
-    private int BORDER_WIDTH = 20;
 
     public void render(Graphics g) {
         g.drawImage(displayedImage, (int) x, (int) y, 128, 128, null);
@@ -155,25 +150,25 @@ public class Player extends GameObject {
         return new Rectangle(
                 (int) x,
                 (int) y,
-                (int) WIDTH,
-                (int) HEIGHT
+                WIDTH,
+                HEIGHT
         );
     }
 
     public Rectangle getBoundsBottom() {
         return new Rectangle(
-                (int) x + BORDER_WIDTH,
+                (int) (x + BORDER_WIDTH),
                 (int) (y + HEIGHT - BORDER_WIDTH),
-                (int) WIDTH - 2 * BORDER_WIDTH,
+                WIDTH - 2 * BORDER_WIDTH,
                 BORDER_WIDTH
         );
     }
 
     public Rectangle getBoundsTop() {
         return new Rectangle(
-                (int) x + BORDER_WIDTH,
+                (int) (x + BORDER_WIDTH),
                 (int) y,
-                (int) WIDTH - BORDER_WIDTH * 2,
+                WIDTH - BORDER_WIDTH * 2,
                 BORDER_WIDTH
         );
     }
@@ -181,28 +176,28 @@ public class Player extends GameObject {
     public Rectangle getBoundsRight() {
         return new Rectangle(
                 (int) (x + WIDTH - BORDER_WIDTH),
-                (int) y + BORDER_WIDTH,
+                (int) (y + BORDER_WIDTH),
                 BORDER_WIDTH,
-                (int) HEIGHT - 2 *BORDER_WIDTH
+                HEIGHT - 2 * BORDER_WIDTH
         );
     }
 
     public Rectangle getBoundsLeft() {
         return new Rectangle(
                 (int) x,
-                (int) y + BORDER_WIDTH,
+                (int) (y + BORDER_WIDTH),
                 BORDER_WIDTH,
-                (int) HEIGHT - BORDER_WIDTH * 2
+                HEIGHT - BORDER_WIDTH * 2
         );
     }
 
-    public float approach(float G, float C, float diff) {
-        float D = G - C;
-        if (D > diff)
-            return C + diff;
-        if (D < -diff)
-            return C - diff;
-        return G;
+    public float approach(float goalVel, float currVel, float diff) {
+        float d = goalVel - currVel;
+        if (d > diff)
+            return currVel + diff;
+        if (d < -diff)
+            return currVel - diff;
+        return goalVel;
     }
 
     public void setDir(Directions dir) {

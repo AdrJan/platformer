@@ -1,13 +1,13 @@
 package com.adrjan.platformer.objects.decor;
 
 import com.adrjan.platformer.framework.data_loaders.BufferedImageLoader;
-import com.adrjan.platformer.objects.ObjectId;
 import com.adrjan.platformer.objects.GameObject;
+import com.adrjan.platformer.objects.ObjectId;
+import com.adrjan.platformer.objects.properties.Renderable;
 
 import java.awt.*;
-import java.util.LinkedList;
 
-public class Lamp extends GameObject {
+public class Lamp extends GameObject implements Renderable {
 
     private int width = 64;
     private int height = 192;
@@ -16,15 +16,9 @@ public class Lamp extends GameObject {
         super(x, y, id);
     }
 
-    @Override
-    public void tick(LinkedList<GameObject> object) {
-
-    }
-
-    @Override
     public void render(Graphics g) {
         g.drawImage(
-                BufferedImageLoader.getImageByName(String.format("lamp.png")),
+                BufferedImageLoader.getImageByName("lamp.png"),
                 (int) x, (int) y, width, height,
                 null
         );

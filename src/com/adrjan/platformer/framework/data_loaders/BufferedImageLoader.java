@@ -11,6 +11,10 @@ import java.util.Map;
 
 public class BufferedImageLoader {
 
+    private BufferedImageLoader() {
+        throw new UnsupportedOperationException();
+    }
+
     private static final Map<String, BufferedImage> bufferedImageMap;
 
     static {

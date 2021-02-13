@@ -12,6 +12,10 @@ import java.awt.image.BufferedImage;
 
 public class LevelLoader {
 
+    private LevelLoader() {
+        throw new UnsupportedOperationException();
+    }
+
     private static Player player;
 
     public static void loadImageLevel(BufferedImage image) {

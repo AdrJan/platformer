@@ -5,12 +5,14 @@ import com.adrjan.platformer.framework.data_loaders.BufferedImageLoader;
 import com.adrjan.platformer.framework.state.GameState;
 import com.adrjan.platformer.objects.GameObject;
 import com.adrjan.platformer.objects.ObjectId;
+import com.adrjan.platformer.objects.properties.Renderable;
+import com.adrjan.platformer.objects.properties.Tickable;
 
 import java.awt.*;
-import java.util.LinkedList;
+import java.util.List;
 import java.util.Random;
 
-public class Coin extends GameObject {
+public class Coin extends GameObject implements Tickable, Renderable {
 
     static Random rand = new Random();
 
@@ -22,10 +24,28 @@ public class Coin extends GameObject {
         countAnimY = rand.nextInt(10);
     }
 
+    public boolean isTaken() {
+        return isTaken;
+    }
+
+    public void setTaken(boolean isTaken) {
+        this.isTaken = isTaken;
+    }
+
     @Override
-    public void tick(LinkedList<GameObject> object) {
+    public Rectangle getBounds() {
+        return new Rectangle((int) x, (int) y, 64, 64);
+    }
+
+    @Override
+    public void render(Graphics g) {
+        g.drawImage(BufferedImageLoader.getImageByName("bottle.png"), (int) x, (int) y, 64, 64, null);
+    }
+
+    @Override
+    public void tick(List<GameObject> object) {
         if (!isTaken()) {
-            if (++countAnimY > 9) {
+            if (++countAnimY > 8) {
                 countAnimY = 0;
             } else if (countAnimY < 5) {
                 y--;
@@ -36,23 +56,5 @@ public class Coin extends GameObject {
             GameState.playerScore += 10;
             Handler.removeObject(this);
         }
-    }
-
-    public boolean isTaken() {
-        return isTaken;
-    }
-
-    public void setTaken(boolean isTaken) {
-        this.isTaken = isTaken;
-    }
-
-    @Override
-    public void render(Graphics g) {
-        g.drawImage(BufferedImageLoader.getImageByName("bottle.png"), (int) x, (int) y, 64, 64, null);
-    }
-
-    @Override
-    public Rectangle getBounds() {
-        return new Rectangle((int) x, (int) y, 64, 64);
     }
 }

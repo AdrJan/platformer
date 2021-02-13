@@ -1,29 +1,22 @@
 package com.adrjan.platformer.objects;
 
-import java.awt.*;
-import java.util.LinkedList;
+import com.adrjan.platformer.objects.properties.Physical;
 
-public abstract class GameObject {
+public abstract class GameObject implements Physical {
 
-    protected float x, y;
     protected ObjectId id;
-    protected float velX = 0, velY = 0;
+    protected float x;
+    protected float y;
+    protected float velX = 0;
+    protected float velY = 0;
     protected boolean falling = true;
     protected boolean jumping = false;
-    protected int width;
-    protected int height;
 
-    public GameObject(float x, float y, ObjectId id) {
+    protected GameObject(float x, float y, ObjectId id) {
+        this.id = id;
         this.x = x;
         this.y = y;
-        this.id = id;
     }
-
-    public abstract void tick(LinkedList<GameObject> object);
-
-    public abstract void render(Graphics g);
-
-    public abstract Rectangle getBounds();
 
     public float getX() {
         return x;
@@ -31,6 +24,14 @@ public abstract class GameObject {
 
     public float getY() {
         return y;
+    }
+
+    public void setVelX(float velX) {
+        this.velX = velX;
+    }
+
+    public ObjectId getId() {
+        return id;
     }
 
     public void setX(float x) {
@@ -49,32 +50,8 @@ public abstract class GameObject {
         return velY;
     }
 
-    public void setVelX(float velX) {
-        this.velX = velX;
-    }
-
     public void setVelY(float velY) {
         this.velY = velY;
-    }
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public ObjectId getId() {
-        return id;
     }
 
     public boolean isFalling() {

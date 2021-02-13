@@ -1,38 +1,30 @@
 package com.adrjan.platformer.objects.blocks;
 
 import com.adrjan.platformer.framework.data_loaders.BufferedImageLoader;
-import com.adrjan.platformer.objects.ObjectId;
 import com.adrjan.platformer.objects.GameObject;
+import com.adrjan.platformer.objects.ObjectId;
+import com.adrjan.platformer.objects.properties.Renderable;
 
 import java.awt.*;
-import java.util.LinkedList;
 
-public class Block extends GameObject {
+public class Block extends GameObject implements Renderable {
 
-    private int width = 64;
-    private int height = 64;
+    private static final int WIDTH = 64;
+    private static final int HEIGHT = 64;
 
     public Block(float x, float y, ObjectId id) {
         super(x, y, id);
-        super.height = height;
-        super.width = width;
-    }
-
-    public void tick(LinkedList<GameObject> object) {
-    }
-
-    public void render(Graphics g) {
-        g.drawRect(
-                (int) x, (int) y, width, height
-        );
-        g.drawImage(
-                BufferedImageLoader.getImageByName(String.format("block1.png")),
-                (int) x, (int) y, width, height,
-                null
-        );
     }
 
     public Rectangle getBounds() {
-        return new Rectangle((int) x, (int) y, width, height);
+        return new Rectangle((int) x, (int) y, WIDTH, HEIGHT);
+    }
+
+    public void render(Graphics g) {
+        g.drawImage(
+                BufferedImageLoader.getImageByName("block1.png"),
+                (int) x, (int) y, WIDTH, HEIGHT,
+                null
+        );
     }
 }
