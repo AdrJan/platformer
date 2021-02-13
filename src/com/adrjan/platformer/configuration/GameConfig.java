@@ -7,4 +7,6 @@ public class GameConfig {
 
     public static float PLAYER_SPEED = 5.0f;
     public static float PLAYER_JUMP_SPEED = 8.0f;
+
+    public static float PLAYER_MOVE_ANIMATION_VEL_X = 1.0f;
 }

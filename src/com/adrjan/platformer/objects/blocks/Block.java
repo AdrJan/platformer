@@ -22,6 +22,9 @@ public class Block extends GameObject {
     }
 
     public void render(Graphics g) {
+        g.drawRect(
+                (int) x, (int) y, width, height
+        );
         g.drawImage(
                 BufferedImageLoader.getImageByName(String.format("block1.png")),
                 (int) x, (int) y, width, height,

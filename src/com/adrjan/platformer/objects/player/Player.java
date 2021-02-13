@@ -13,7 +13,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.LinkedList;
 
-public class Player extends GameObject  {
+public class Player extends GameObject {
 
     private final float WIDTH = 128;
     private final float HEIGHT = 128;
@@ -32,8 +32,8 @@ public class Player extends GameObject  {
 
     private BufferedImage displayedImage;
 
-    protected boolean falling = true;
     protected boolean jumping = false;
+    protected boolean falling = true;
 
     public Player(float x, float y, ObjectId id) {
         super(x, y, id);
@@ -60,9 +60,9 @@ public class Player extends GameObject  {
     }
 
     public void animate() {
-        if (this.isJumping())
+        if (this.jumping)
             displayedImage = animationsJump.getImage();
-        else if (this.velX != 0.0)
+        else if (Math.abs(this.velX) > GameConfig.PLAYER_MOVE_ANIMATION_VEL_X)
             displayedImage = animationsMove.getImage();
         else
             displayedImage = animationsIdle.getImage();
@@ -73,33 +73,33 @@ public class Player extends GameObject  {
 
     private void collision(LinkedList<GameObject> object) {
         for (int i = 0; i < object.size(); i++) {
-            GameObject tempObject = Handler.gameObjects.get(i);
+            GameObject otherObject = Handler.gameObjects.get(i);
 
-            if (tempObject.getId() == ObjectId.Block) {
-                if (getBoundsTop().intersects(tempObject.getBounds())) {
-                    y = tempObject.getY() + (HEIGHT / 2);
+            if (otherObject.getId() == ObjectId.Block) {
+                if (getBoundsTop().intersects(otherObject.getBounds())) {
+                    y += velY + 2;
                     velY = 0;
                 }
-                if (getBounds().intersects(tempObject.getBounds())) {
-                    y = tempObject.getY() - HEIGHT + 1;
+                if (getBoundsBottom().intersects(otherObject.getBounds())) {
+                    y = otherObject.getY() - HEIGHT;
                     velY = 0;
                     falling = false;
                     jumping = false;
                 } else
                     falling = true;
-                if (getBoundsRight().intersects(tempObject.getBounds())) {
-                    x = tempObject.getX() - width;
+                if (getBoundsRight().intersects(otherObject.getBounds())) {
+                    x = otherObject.getX() - WIDTH;
                     velX = 0;
                 }
-                if (getBoundsLeft().intersects(tempObject.getBounds())) {
+                if (getBoundsLeft().intersects(otherObject.getBounds())) {
+                    x = otherObject.getX() + 64;
                     velX = 0;
-                    x = tempObject.getX() + tempObject.getWidth();
                 }
             }
 
-            if (tempObject.getId() == ObjectId.Coin) {
-                if (getBounds().intersects(tempObject.getBounds()) || getBoundsTop().intersects(tempObject.getBounds())) {
-                    Coin coin = (Coin) tempObject;
+            if (otherObject.getId() == ObjectId.Coin) {
+                if (getBounds().intersects(otherObject.getBounds()) || getBoundsTop().intersects(otherObject.getBounds())) {
+                    Coin coin = (Coin) otherObject;
                     coin.setTaken(true);
                 }
             }
@@ -115,13 +115,17 @@ public class Player extends GameObject  {
             x = 0;
         }
 
+        System.out.println(falling + " " + jumping + " " + velX + " " + x);
+
         if (falling || jumping) {
             velY += GameConfig.PLAYER_GRAVITY;
-
             if (velY > GameConfig.PLAYER_MAX_FALL_SPEED)
                 velY = GameConfig.PLAYER_MAX_FALL_SPEED;
         }
-
+        if (this.keyPressedW && !this.jumping) {
+            velY -= GameConfig.PLAYER_JUMP_SPEED;
+            this.jumping = true;
+        }
         if (this.keyPressedD) {
             this.setVelX(this.approach(GameConfig.PLAYER_SPEED, this.velX, 0.30f));
             this.setDir(Directions.RIGHT);
@@ -134,21 +138,6 @@ public class Player extends GameObject  {
             this.lastDir = Directions.LEFT;
             this.noKeyPressed = false;
         }
-        if (this.keyPressedW && !this.jumping) {
-            y = y - 1;
-            velY = -GameConfig.PLAYER_JUMP_SPEED;
-            this.setJumping(true);
-        }
-        if (this.keyPressedW && this.keyPressedD) {
-            this.setVelX(approach(GameConfig.PLAYER_SPEED, this.velX, 0.30f));
-            this.setDir(Directions.RIGHT);
-            this.noKeyPressed = false;
-        }
-        if (this.keyPressedW && this.keyPressedA) {
-            this.setVelX(approach(-GameConfig.PLAYER_SPEED, this.velX, 0.30f));
-            this.setDir(Directions.LEFT);
-            this.noKeyPressed = false;
-        }
         if (!this.keyPressedA && !this.keyPressedD) {
             this.setVelX(this.approach(0, this.velX, 0.30f));
             this.setDir(Directions.NO_DIR);
@@ -156,24 +145,55 @@ public class Player extends GameObject  {
         }
     }
 
+    private int BORDER_WIDTH = 20;
+
     public void render(Graphics g) {
         g.drawImage(displayedImage, (int) x, (int) y, 128, 128, null);
     }
 
     public Rectangle getBounds() {
-        return new Rectangle(((int) ((int) x + (WIDTH / 4))), (int) ((int) y + (HEIGHT / 2)), (int) WIDTH / 2, (int) HEIGHT / 2);
+        return new Rectangle(
+                (int) x,
+                (int) y,
+                (int) WIDTH,
+                (int) HEIGHT
+        );
+    }
+
+    public Rectangle getBoundsBottom() {
+        return new Rectangle(
+                (int) x + BORDER_WIDTH,
+                (int) (y + HEIGHT - BORDER_WIDTH),
+                (int) WIDTH - 2 * BORDER_WIDTH,
+                BORDER_WIDTH
+        );
     }
 
     public Rectangle getBoundsTop() {
-        return new Rectangle(((int) ((int) x + (WIDTH / 4))), (int) y, (int) WIDTH / 2, (int) HEIGHT / 2);
+        return new Rectangle(
+                (int) x + BORDER_WIDTH,
+                (int) y,
+                (int) WIDTH - BORDER_WIDTH * 2,
+                BORDER_WIDTH
+        );
     }
 
     public Rectangle getBoundsRight() {
-        return new Rectangle((int) ((int) x + WIDTH - 20), (int) y + 10, 5, (int) HEIGHT - 20);
+        return new Rectangle(
+                (int) (x + WIDTH - BORDER_WIDTH),
+                (int) y + BORDER_WIDTH,
+                BORDER_WIDTH,
+                (int) HEIGHT - 2 *BORDER_WIDTH
+        );
     }
 
     public Rectangle getBoundsLeft() {
-        return new Rectangle((int) x + 20, (int) y + 10, 5, (int) HEIGHT - 20);
+        return new Rectangle(
+                (int) x,
+                (int) y + BORDER_WIDTH,
+                BORDER_WIDTH,
+                (int) HEIGHT - BORDER_WIDTH * 2
+        );
     }
 
     public float approach(float G, float C, float diff) {
